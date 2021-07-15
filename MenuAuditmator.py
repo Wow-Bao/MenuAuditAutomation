@@ -1,11 +1,12 @@
 class Item:
-    def __init__(self, name, description, modifier_groups):
+    def __init__(self, name, description, modifier_groups, template_item):
         self.name = name
         self.description = description
         self.modifier_groups = modifier_groups
+        self.template_item = template_item
     def addModifierGroup(group):
         modifier_groups.append(group)
-    def getIssues(template_item):
+    def getIssues():
         output = []
         if(description != template_item.description):
             output.append(Issue("Item", template_item.name, "Incorrect description"))
@@ -22,12 +23,13 @@ class Item:
         return output
 
 class ModifierGroup:
-    def __init__(self, name, modifiers):
+    def __init__(self, name, modifiers, template_group):
         self.name = name
         self.modifiers = modifiers
+        self.template_group = template_group
     def addModifier(modifier):
         modifiers.append(modifier)
-    def getIssues(template_group):
+    def getIssues():
         output = []
         if(self.name != template_group.name):
             output.append(Issue("Modifier Group", template_group.name, "Name does not match template"))
@@ -54,10 +56,12 @@ class Issue:
         return level + " - " + location + " - " + body
 
 class Menu:
-    def __init__(self, deep_link, address):
+    def __init__(self, deep_link, address, template_menu):
         self.items = []
         self.categories = []
         self.address = address
+        self.template_menu = template_menu
+        self.issues = []
     def loadItems(deep_link):
         driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe")
         driver.get("https://www.doordash.com/?newUser=false")
@@ -115,12 +119,14 @@ class Menu:
             close = driver.find_element_by_css_selector("button[aria-label*='Close']")
             close.click()
             time.sleep(1)
-    def compare(template_menu):
+    def compare():
         real_items = items
         template_items = template_menu.items
         real_categories = real_categories
         template_categories = template_menu.categories
         output = []
+
+        items_to_compare = []
 
         #compare categories
         #TODO: don't highlight missing Drinks, Bundles, Desserts categories, but also don't flag them as extraneous
@@ -134,13 +140,25 @@ class Menu:
 
         #compare lists of items
         for t_item in template_items:
-            try:
-                real_items.remove(t_item)
-            except ValueError:
+            if(t_item.name in [i.name for i in real_items]):
+                real_items[[i.name for i in real_items].index(t_item.name)].template_item = t_item
+                items_to_compare.append(real_items[[i.name for i in real_items].index(t_item.name)])
+                real_items.remove(real_items[[i.name for i in real_items].index(t_item.name)])
+            else:
                 output.append(Issue("Item", t_item.name, t_item.name + " is missing!"))
         for extra_item in real_items:
-            output.append(Issue("Item", extra_item.name, "Item " + extra_item.name + " not on template menu"))
+            output.append(Issue("Item", extra_item.name, "Extraneous item " + extra_item.name + " found"))
         
+        print("Comparing " + len(items_to_compare) + " items")
+        for item in items_to_compare:
+            output.append(item.getIssues())
+
+        
+        issues = output
+        return output
+
+
+
 
 
         

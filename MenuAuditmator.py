@@ -52,6 +52,7 @@ class Issue:
         self.body = body
     def output():
         return level + " - " + location + " - " + body
+
 class Menu:
     def __init__(self, deep_link, address):
         self.items = []
@@ -69,6 +70,14 @@ class Menu:
         time.sleep(0.5)
         driver.get(deep_link)
         time.sleep(1.5)
+
+        #Load categories
+        category_list = driver.find_elements_by_css_selector("h2[data-category-scroll-selector]")
+        category_texts = [e.text for e in category_list]
+        categories = category_texts
+
+        #Load items
+        #items are located by searching rectangular buttons
         item_button_list = driver.find_elements_by_css_selector("button[shape='Rectangle']")
         actions = ActionChains(driver)
         actions2 = ActionChains(driver)
@@ -109,7 +118,21 @@ class Menu:
     def compare(template_menu):
         real_items = items
         template_items = template_menu.items
+        real_categories = real_categories
+        template_categories = template_menu.categories
         output = []
+
+        #compare categories
+        #TODO: don't highlight missing Drinks, Bundles, Desserts categories, but also don't flag them as extraneous
+        for t_category in template_categories:
+            try:
+                real_categories.remove(t_category)
+            except ValueError:
+                output.append(Issue("Category", t_category.name, t_category.name + " is missing!"))
+        for extra_category in real_categories:
+            output.append(Issue("Category", extra_category.name, "Category " + extra_category.name + " not on template menu"))
+
+        #compare lists of items
         for t_item in template_items:
             try:
                 real_items.remove(t_item)
@@ -117,6 +140,7 @@ class Menu:
                 output.append(Issue("Item", t_item.name, t_item.name + " is missing!"))
         for extra_item in real_items:
             output.append(Issue("Item", extra_item.name, "Item " + extra_item.name + " not on template menu"))
+        
 
 
         

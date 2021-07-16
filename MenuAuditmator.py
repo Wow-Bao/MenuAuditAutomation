@@ -157,7 +157,15 @@ class Menu:
         issues = output
         return output
 
-
+class TemplateMenu(Menu):
+    def __init__(self, deep_link, address):
+        Menu.__init__(self, deep_link, address, None)
+    def addItem(item):
+        items.append(item)
+    def setCategories(categories):
+        self.categories = categories
+    
+    
 
 
 

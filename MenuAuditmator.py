@@ -126,10 +126,10 @@ class Menu:
             close.click()
             time.sleep(1)
     def compare(self):
-        real_items = self.items
-        template_items = self.template_menu.items
-        real_categories = self.categories
-        template_categories = self.template_menu.categories
+        real_items = self.items.copy()
+        template_items = self.template_menu.items.copy()
+        real_categories = self.categories.copy()
+        template_categories = self.template_menu.categories.copy()
         output = []
 
         items_to_compare = []
@@ -142,22 +142,21 @@ class Menu:
         except:
             pass
         for t_category in template_categories:
-            try:
-                real_categories.remove(t_category)
-            except ValueError:
+            if(t_category in real_categories):
                 output.append(Issue("Category", t_category, t_category + " is missing!"))
         for extra_category in real_categories:
             output.append(Issue("Category", extra_category, "Category " + extra_category + " not on template menu"))
 
         #compare lists of items
+        extra_items = []
         for t_item in template_items:
             if(t_item.name in [i.name for i in real_items]):
                 real_items[[i.name for i in real_items].index(t_item.name)].template_item = t_item
                 items_to_compare.append(real_items[[i.name for i in real_items].index(t_item.name)])
-                real_items.remove(real_items[[i.name for i in real_items].index(t_item.name)])
+                extra_items.append(real_items[[i.name for i in real_items].index(t_item.name)])
             else:
                 output.append(Issue("Item", t_item.name, t_item.name + " is missing!"))
-        for extra_item in real_items:
+        for extra_item in extra_items:
             output.append(Issue("Item", extra_item.name, "Extraneous item " + extra_item.name + " found"))
         
         print("Comparing " + str(len(items_to_compare)) + " items")

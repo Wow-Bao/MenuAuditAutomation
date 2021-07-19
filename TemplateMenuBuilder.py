@@ -1,4 +1,7 @@
-from MenuAuditmator import ModifierGroup, Item, Menu
+from MenuAuditmator import ModifierGroup, Item, Menu, TemplateMenu
 
-def BuildMenuTemplate():
-    return Menu(None, None, None)
+def BuildMenuTemplate(isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
+    menu = TemplateMenu()
+    
+
+    

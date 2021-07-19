@@ -1,49 +1,54 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+import time
+
 class Item:
-    def __init__(self, name, description, modifier_groups, template_item):
+    def __init__(self, name, description, modifier_groups):
         self.name = name
         self.description = description
         self.modifier_groups = modifier_groups
-        self.template_item = template_item
-    def addModifierGroup(group):
-        modifier_groups.append(group)
-    def getIssues():
+        self.template_item = None
+    def addModifierGroup(self, group):
+        self.modifier_groups.append(group)
+    def getIssues(self):
         output = []
-        if(description != template_item.description):
-            output.append(Issue("Item", template_item.name, "Incorrect description"))
+        if(self.description != self.template_item.description):
+            output.append(Issue("Item", self.template_item.name, "Incorrect description"))
             
-        if(len(modifier_groups) > len(template_item.modifier_groups)):
-            output.append(Issue("Item", template_item.name, "Too many modifier groups"))
-        elif(len(self.modifier_groups) < len(template_item.modifier_groups)):
-            output.append(Issue("Item", template_item.name, "Too few modifier groups"))
-        
+        if(len(self.modifier_groups) > len(self.template_item.modifier_groups)):
+            output.append(Issue("Item", self.template_item.name, "Too many modifier groups"))
+        elif(len(self.modifier_groups) < len(self.template_item.modifier_groups)):
+            output.append(Issue("Item", self.template_item.name, "Too few modifier groups"))    
         else:
-            for i in range(0, len(modifier_groups)):
-                if(modifier_groups[i].getIssues(template_item.modifier_groups[i])):
-                    output.append(modifier_groups[i].getIssues(template_item.modifier_groups[i]))
+            for i in range(0, len(self.modifier_groups)):
+                if(self.modifier_groups[i].getIssues(self.template_item.modifier_groups[i])):
+                    output.append(self.modifier_groups[i].getIssues(self.template_item.modifier_groups[i]))
         return output
 
 class ModifierGroup:
-    def __init__(self, name, modifiers, template_group):
+    def __init__(self, name, modifiers):
         self.name = name
         self.modifiers = modifiers
+        self.template_group = None
+    def addModifier(self, modifier):
+        self.modifiers.append(modifier)
+    def getIssues(self, template_group):
         self.template_group = template_group
-    def addModifier(modifier):
-        modifiers.append(modifier)
-    def getIssues():
         output = []
-        if(self.name != template_group.name):
-            output.append(Issue("Modifier Group", template_group.name, "Name does not match template"))
+        if(self.name != self.template_group.name):
+            output.append(Issue("Modifier Group", self.template_group.name, "Name does not match template"))
             
-        if(len(self.modifiers) != len(template_group.modifiers)):
-            output.append(Issue("Modifier Group", template_group.name, "Incorrect number of modifiers within modifier group - either missing or too many modifiers"))
+        if(len(self.modifiers) != len(self.template_group.modifiers)):
+            output.append(Issue("Modifier Group", self.template_group.name, "Incorrect number of modifiers within modifier group - either missing or too many modifiers"))
         else:
             o=[]
-            if(self.modifiers != template_group.modifiers):
+            if(self.modifiers != self.template_group.modifiers):
                 for i in range(0, len(self.modifiers)):
-                    if(self.modifiers.sort()[i] != template_group.modifiers.sort()[i]):
-                        o.append(Issue("Modifier", template_group.name, "Menu lists modifier as " + self.modifiers.sort()[i] + " instead of " + template_group.modifiers.sort()[i] + "\n"))
+                    if(self.modifiers.sort()[i] != self.template_group.modifiers.sort()[i]):
+                        o.append(Issue("Modifier", self.template_group.name, "Menu lists modifier as " + self.modifiers.sort()[i] + " instead of " + self.template_group.modifiers.sort()[i] + "\n"))
                 if(not o):
-                    o = Issue("Modifier Group", template_group.name, "Modifiers scrambled within modifier group - adjust order of modifiers to match template")
+                    o = Issue("Modifier Group", self.template_group.name, "Modifiers scrambled within modifier group - adjust order of modifiers to match template")
             output.append(o)
         return output
 
@@ -52,33 +57,34 @@ class Issue:
         self.level = level
         self.location = location
         self.body = body
-    def output():
-        return level + " - " + location + " - " + body
+    def output(self):
+        return self.level + " - " + self.location + " - " + self.body
 
 class Menu:
-    def __init__(self, deep_link, address, template_menu):
+    def __init__(self, address, template_menu):
         self.items = []
         self.categories = []
         self.address = address
         self.template_menu = template_menu
         self.issues = []
-    def loadItems(deep_link):
+    def loadItems(self, deep_link):
         driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe")
         driver.get("https://www.doordash.com/?newUser=false")
         time.sleep(3)
         elem = driver.find_element_by_css_selector("input")
         elem.clear()
-        elem.send_keys(address)
+        elem.send_keys(self.address)
         time.sleep(0.5)
         elem.send_keys(Keys.ENTER)
-        time.sleep(0.5)
+        time.sleep(1)
         driver.get(deep_link)
         time.sleep(1.5)
 
         #Load categories
         category_list = driver.find_elements_by_css_selector("h2[data-category-scroll-selector]")
         category_texts = [e.text for e in category_list]
-        categories = category_texts
+        self.categories = category_texts
+        print(self.categories)
 
         #Load items
         #items are located by searching rectangular buttons
@@ -115,28 +121,33 @@ class Menu:
                     mgroups.append(ModifierGroup(group_title, modifiers))
             except NameError:
                 print("no modifiers for this item")
-            items.append(Item(item_title, item_description, mgroups))
+            self.items.append(Item(item_title, item_description, mgroups))
             close = driver.find_element_by_css_selector("button[aria-label*='Close']")
             close.click()
             time.sleep(1)
-    def compare():
-        real_items = items
-        template_items = template_menu.items
-        real_categories = real_categories
-        template_categories = template_menu.categories
+    def compare(self):
+        real_items = self.items
+        template_items = self.template_menu.items
+        real_categories = self.categories
+        template_categories = self.template_menu.categories
         output = []
 
         items_to_compare = []
 
         #compare categories
         #TODO: don't highlight missing Drinks, Bundles, Desserts categories, but also don't flag them as extraneous
+        try:
+            real_categories.remove("Drinks")
+            real_categories.remove("Dessert")
+        except:
+            pass
         for t_category in template_categories:
             try:
                 real_categories.remove(t_category)
             except ValueError:
-                output.append(Issue("Category", t_category.name, t_category.name + " is missing!"))
+                output.append(Issue("Category", t_category, t_category + " is missing!"))
         for extra_category in real_categories:
-            output.append(Issue("Category", extra_category.name, "Category " + extra_category.name + " not on template menu"))
+            output.append(Issue("Category", extra_category, "Category " + extra_category + " not on template menu"))
 
         #compare lists of items
         for t_item in template_items:
@@ -149,7 +160,11 @@ class Menu:
         for extra_item in real_items:
             output.append(Issue("Item", extra_item.name, "Extraneous item " + extra_item.name + " found"))
         
-        print("Comparing " + len(items_to_compare) + " items")
+        print("Comparing " + str(len(items_to_compare)) + " items")
+
+        for item in items_to_compare:
+            for i in range(len(item.modifier_groups)):
+                item.modifier_groups[i].template_group = item.template_item.modifier_groups[i]
         for item in items_to_compare:
             output.append(item.getIssues())
 
@@ -158,11 +173,11 @@ class Menu:
         return output
 
 class TemplateMenu(Menu):
-    def __init__(self, deep_link, address):
-        Menu.__init__(self, deep_link, address, None)
-    def addItem(item):
-        items.append(item)
-    def setCategories(categories):
+    def __init__(self):
+        Menu.__init__(self, None, None, None)
+    def addItem(self, item):
+        self.items.append(item)
+    def setCategories(self, categories):
         self.categories = categories
     
     

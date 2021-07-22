@@ -68,6 +68,7 @@ class Menu:
         self.template_menu = template_menu
         self.issues = []
     def loadItems(self, deep_link):
+        """Scrapes DoorDash menu page for all the necessary data and loads it into Item and ModifierGroup objects within the Menu object"""
         driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe")
         driver.get("https://www.doordash.com/?newUser=false")
         time.sleep(3)
@@ -126,6 +127,7 @@ class Menu:
             close.click()
             time.sleep(1)
     def compare(self):
+        """Compares the loaded menu with a template (set by the template_menu property) and outputs a list of Issue objects"""
         real_items = self.items.copy()
         template_items = self.template_menu.items.copy()
         real_categories = self.categories.copy()
@@ -135,12 +137,13 @@ class Menu:
         items_to_compare = []
 
         #compare categories
-        #TODO: don't highlight missing Drinks, Bundles, Desserts categories, but also don't flag them as extraneous
-        try:
-            real_categories.remove("Drinks")
-            real_categories.remove("Dessert")
-        except:
-            pass
+        to_remove = ["Drinks", "Desserts", "Beverages"]
+        for r in to_remove:
+            try:
+                real_categories.remove(r)
+            except:
+                pass
+
         for t_category in template_categories:
             if(t_category in real_categories):
                 output.append(Issue("Category", t_category, t_category + " is missing!"))
@@ -148,19 +151,20 @@ class Menu:
             output.append(Issue("Category", extra_category, "Category " + extra_category + " not on template menu"))
 
         #compare lists of items
-        extra_items = []
         for t_item in template_items:
             if(t_item.name in [i.name for i in real_items]):
                 real_items[[i.name for i in real_items].index(t_item.name)].template_item = t_item
                 items_to_compare.append(real_items[[i.name for i in real_items].index(t_item.name)])
-                extra_items.append(real_items[[i.name for i in real_items].index(t_item.name)])
             else:
                 output.append(Issue("Item", t_item.name, t_item.name + " is missing!"))
-        for extra_item in extra_items:
-            output.append(Issue("Item", extra_item.name, "Extraneous item " + extra_item.name + " found"))
+        for r_item in real_items:
+            if(r_item not in items_to_compare):
+                output.append(Issue("Item", r_item.name, "Extraneous item " + r_item.name + " found"))
         
         print("Comparing " + str(len(items_to_compare)) + " items")
 
+        #compare each item
+        #TODO: make this use inheritance and polymorphism and all that jazz to not fucking suck lol
         for item in items_to_compare:
             for i in range(len(item.modifier_groups)):
                 item.modifier_groups[i].template_group = item.template_item.modifier_groups[i]
@@ -170,14 +174,6 @@ class Menu:
         
         issues = output
         return output
-
-class TemplateMenu(Menu):
-    def __init__(self):
-        Menu.__init__(self, None, None, None)
-    def addItem(self, item):
-        self.items.append(item)
-    def setCategories(self, categories):
-        self.categories = categories
     
     
 

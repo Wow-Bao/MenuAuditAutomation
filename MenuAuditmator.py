@@ -145,10 +145,11 @@ class Menu:
                 pass
 
         for t_category in template_categories:
-            if(t_category in real_categories):
+            if(t_category not in real_categories):
                 output.append(Issue("Category", t_category, t_category + " is missing!"))
-        for extra_category in real_categories:
-            output.append(Issue("Category", extra_category, "Category " + extra_category + " not on template menu"))
+        for e_category in real_categories:
+            if(e_category not in template_categories):
+                output.append(Issue("Category", e_category, "Category " + e_category + " not on template menu"))
 
         #compare lists of items
         for t_item in template_items:
@@ -158,7 +159,7 @@ class Menu:
             else:
                 output.append(Issue("Item", t_item.name, t_item.name + " is missing!"))
         for r_item in real_items:
-            if(r_item not in items_to_compare):
+            if(r_item.name not in [i.name for i in items_to_compare]):
                 output.append(Issue("Item", r_item.name, "Extraneous item " + r_item.name + " found"))
         
         print("Comparing " + str(len(items_to_compare)) + " items")

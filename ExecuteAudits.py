@@ -5,6 +5,8 @@ import sys
 
 # input_deep_link = sys.argv[1]
 
+infile = ""
+
 menu = Menu("1 Providence Place, Providence, RI", None)
 temp = BuildMenuTemplate('C:\\Users\\creek\\Desktop\\WowBaoScripts\\MenuAuditAutomation\\ItemReference.csv', 'C:\\Users\\creek\\Desktop\\WowBaoScripts\\MenuAuditAutomation\\ModifierGroupReference.csv', True, False, False, False, True, True)
 

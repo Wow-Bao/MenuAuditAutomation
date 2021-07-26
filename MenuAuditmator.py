@@ -23,7 +23,7 @@ class Item:
         else:
             for i in range(0, len(self.modifier_groups)):
                 if(self.modifier_groups[i].getIssues(self.template_item.modifier_groups[i])):
-                    output.append(self.modifier_groups[i].getIssues(self.template_item.modifier_groups[i]))
+                    output.extend(self.modifier_groups[i].getIssues(self.template_item.modifier_groups[i]))
         return output
 
 class ModifierGroup:
@@ -46,10 +46,11 @@ class ModifierGroup:
             if(self.modifiers != self.template_group.modifiers):
                 for i in range(0, len(self.modifiers)):
                     if(self.modifiers.sort()[i] != self.template_group.modifiers.sort()[i]):
-                        o.append(Issue("Modifier", self.template_group.name, "Menu lists modifier as " + self.modifiers.sort()[i] + " instead of " + self.template_group.modifiers.sort()[i] + "\n"))
+                        o.append(Issue("Modifier", self.template_group.name, "Menu lists modifier as " + self.modifiers.sort()[i] + " instead of " + self.template_group.modifiers.sort()[i]))
                 if(not o):
-                    o = Issue("Modifier Group", self.template_group.name, "Modifiers scrambled within modifier group - adjust order of modifiers to match template")
-            output.append(o)
+                    pass
+                    #o.append(Issue("Modifier Group", self.template_group.name, "Modifiers scrambled within modifier group - adjust order of modifiers to match template"))
+            output.extend(o)
         return output
 
 class Issue:
@@ -89,7 +90,7 @@ class Menu:
 
         #Load items
         #items are located by searching rectangular buttons
-        item_button_list = driver.find_elements_by_css_selector("button[shape='Rectangle']")
+        item_button_list = driver.find_elements_by_xpath("//h2[@data-category-scroll-selector='Popular%20Items']/parent::div/following-sibling::div/descendant::button")
         actions = ActionChains(driver)
         actions2 = ActionChains(driver)
         for i in item_button_list:
@@ -170,7 +171,7 @@ class Menu:
             for i in range(len(item.modifier_groups)):
                 item.modifier_groups[i].template_group = item.template_item.modifier_groups[i]
         for item in items_to_compare:
-            output.append(item.getIssues())
+            output.extend(item.getIssues())
 
         
         issues = output

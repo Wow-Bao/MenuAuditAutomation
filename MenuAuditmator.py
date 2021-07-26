@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import time
+import pandas as pd
 
 class Item:
     def __init__(self, name, description, modifier_groups):
@@ -45,7 +46,7 @@ class ModifierGroup:
             o=[]
             if(self.modifiers != self.template_group.modifiers):
                 for i in range(0, len(self.modifiers)):
-                    if(self.modifiers.sort()[i] != self.template_group.modifiers.sort()[i]):
+                    if(sorted(self.modifiers)[i] != sorted(self.template_group.modifiers)[i]):
                         o.append(Issue("Modifier", self.template_group.name, "Menu lists modifier as " + self.modifiers.sort()[i] + " instead of " + self.template_group.modifiers.sort()[i]))
                 if(not o):
                     pass
@@ -167,14 +168,16 @@ class Menu:
 
         #compare each item
         #TODO: make this use inheritance and polymorphism and all that jazz to not fucking suck lol
-        for item in items_to_compare:
-            for i in range(len(item.modifier_groups)):
-                item.modifier_groups[i].template_group = item.template_item.modifier_groups[i]
+        # for item in items_to_compare:
+        #     if(item.modifier_groups and item.template_item.modifier_groups):
+        #         for i in range(min(len(item.modifier_groups), len(item.template_item.modifier_groups))):
+        #             item.modifier_groups[i].template_group = item.template_item.modifier_groups[i]
         for item in items_to_compare:
             output.extend(item.getIssues())
 
         
         issues = output
+        
         return output
     
     

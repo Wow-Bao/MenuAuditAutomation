@@ -1,0 +1,346 @@
+{
+	"Categories" : [
+		{
+			"Name" : "Bao"
+		},
+		{
+			"Name" : "Bowls"
+		},
+		{
+			"Name" : "Pan-Seared Potstickers",
+			"potDumpDependency" : false
+		},
+		{
+			"Name" : "Steamed Dumplings",
+			"potDumpDependency" : false
+		},
+		{
+			"Name" : "Combo"
+		},
+		{
+			"Name" : "Bundles",
+			"bundleDependency" : true
+		},
+		{
+			"Name" : "Potstickers and Dumplings",
+			"potDumpDependency" : true
+		}
+	],
+	"Items" : [
+		{
+			"Name" : "2 Pack of Bao",
+			"Description" : "Mix-and-match any flavor of bao!",
+			"ModifierGroups" : [
+				{
+					"Name" : "Bao 1st Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 2nd Choice",
+					"ModifierSet" : "Bao"
+				}
+			]
+		},
+		{
+			"Name" : "6 Pack of Bao",
+			"Description" : "Mix-and-match any flavor of bao!",
+			"ModifierGroups" : [
+				{
+					"Name" : "Bao 1st Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 2nd Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 3rd Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 4th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 5th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 6th Choice",
+					"ModifierSet" : "Bao"
+				}
+			]
+		},
+		{
+			"Name" : "12 Pack of Bao",
+			"Description" : "Mix-and-match any flavor of bao!",
+			"ModifierGroups" : [
+				{
+					"Name" : "Bao 1st Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 2nd Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 3rd Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 4th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 5th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 6th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 7th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 8th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 9th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 10th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 11th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 12th Choice",
+					"ModifierSet" : "Bao"
+				}
+			]
+		},
+		{
+			"Name" : "18 Pack of Bao",
+			"Description" : "Mix-and-match any flavor of bao!",
+			"ModifierGroups" : [
+				{
+					"Name" : "Bao 1st Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 2nd Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 3rd Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 4th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 5th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 6th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 7th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 8th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 9th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 10th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 11th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 12th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 13th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 14th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 15th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 16th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 17th Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 18th Choice",
+					"ModifierSet" : "Bao"
+				}
+			]
+		},
+		{
+			"Name" : "Teriyaki Chicken Bowl",
+			"Description" : "Roasted chicken that is infused with a rich, dark, and sweet teriyaki barbecue sauce, served on jasmine white rice."
+		},
+		{
+			"Name" : "Spicy Kung Pao Chicken Bowl",
+			"Description" : "Tender chicken that is cooked in a sweet and spicy sichuan chili-soy sauce, served on jasmine white rice."
+		},
+		{
+			"Name" : "Orange Chicken Bowl",
+			"Description" : "Chicken in a sweet orange sauce with red peppers and candied orange peel, served on jasmine white rice."
+		},
+		{
+			"Name" : "5 Pack Potstickers",
+			"Description" : "Pan-Seared with your choice of filling between Green Vegetable and Ginger Chicken.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Potsticker Option",
+					"ModifierSet" : "Potsticker/Dumpling"
+				}
+			]
+		},
+		{
+			"Name" : "8 Pack Potstickers",
+			"Description" : "Pan-Seared with your choice of filling between Green Vegetable and Ginger Chicken.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Potsticker Option",
+					"ModifierSet" : "Potsticker/Dumpling"
+				}
+			]
+		},
+		{
+			"Name" : "12 Pack Potstickers",
+			"Description" : "Pan-Seared with your choice of filling between Green Vegetable and Ginger Chicken.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Potsticker Option",
+					"ModifierSet" : "Potsticker/Dumpling"
+				}
+			]
+		},
+		{
+			"Name" : "30 Pack Potstickers",
+			"Description" : "Pan-Seared with your choice of filling between Green Vegetable and Ginger Chicken.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Potsticker Option",
+					"ModifierSet" : "Potsticker/Dumpling"
+				}
+			]
+		},
+		{
+			"Name" : "5 Pack Dumplings",
+			"Description" : "Steamed with your choice of filling bewteen Green Vegetable and Ginger Chicken.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Dumpling Option",
+					"ModifierSet" : "Potsticker/Dumpling"
+				}
+			]
+		},
+		{
+			"Name" : "8 Pack Dumplings",
+			"Description" : "Steamed with your choice of filling bewteen Green Vegetable and Ginger Chicken.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Dumpling Option",
+					"ModifierSet" : "Potsticker/Dumpling"
+				}
+			]
+		},
+		{
+			"Name" : "12 Pack Dumplings",
+			"Description" : "Steamed with your choice of filling bewteen Green Vegetable and Ginger Chicken.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Dumpling Option",
+					"ModifierSet" : "Potsticker/Dumpling"
+				}
+			]
+		},
+		{
+			"Name" : "30 Pack Dumplings",
+			"Description" : "Steamed with your choice of filling bewteen Green Vegetable and Ginger Chicken.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Dumpling Option",
+					"ModifierSet" : "Potsticker/Dumpling"
+				}
+			]
+		},
+		{
+			"Name" : "Bowl and 2 Bao",
+			"Description" : "A choice of a Teriyaki Chicken, Spicy Kung Pao Chicken, or Orange Chicken bowl, and 2 Teriyaki Chicken, BBQ Berkshire Pork, Spicy Mongolian Beef or Whole Wheat Vegetable bao.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Bao 1st Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bao 2nd Choice",
+					"ModifierSet" : "Bao"
+				},
+				{
+					"Name" : "Bowl Option",
+					"ModifierSet" : "Bowl"
+				}
+			]
+		},
+		{
+			"Name" : "Bowl and 3 Potstickers",
+			"Description" : "A choice of a Teriyaki Chicken, Spicy Kung Pao Chicken, or Orange Chicken bowl, and 3 Ginger Chicken or Green Vegetable potstickers.",
+			"ModifierGroups" : [
+				{
+					"Name" : "Potsticker Option",
+					"ModifierSet" : "Potsticker/Dumpling"
+				},
+				{
+					"Name" : "Bowl Option",
+					"ModifierSet" : "Bowl"
+				}
+			]
+		},
+		{
+			"Name" : "The Sharing Bundle",
+			"Description" : "A shareable meal for 2-3 people. The Sharing Bundle contains 6 of our fluffy, steamed bao (2 Teriyaki Chicken, 2 BBQ Berkshire Pork, and 2 Spicy Mongolian Beef) and 12 pan-seared Ginger Chicken potstickers.",
+			"bundleDependency" : true
+		},
+		{
+			"Name" : "The Family Bundle",
+			"Description" : "An easy meal for 4-5 people. The Family Bundle is a combination of our fan favorites with 3 BBQ Berkshire Pork bao, 3 Spicy Mongolian Beef bao, 12 pan-seared Ginger Chicken potstickers, and 3 Teriyaki Chicken bowls.",
+			"bundleDependency" : true
+		},
+		{
+			"Name" : "The Party Bundle",
+			"Description" : "Perfect for a larger crowd of 8-12 people. The Party Bundle is 24 of our signature bao (6 each of Teriyaki Chicken, BBQ Berkshire Pork, Spicy Mongolian Beef, and Whole Wheat Vegetable) and 24 pan-seared Ginger Chicken potstickers.",
+			"bundleDependency" : true
+		}
+	]
+}

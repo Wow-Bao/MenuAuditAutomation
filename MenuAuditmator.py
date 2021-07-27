@@ -47,7 +47,7 @@ class ModifierGroup:
             if(self.modifiers != self.template_group.modifiers):
                 for i in range(0, len(self.modifiers)):
                     if(sorted(self.modifiers)[i] != sorted(self.template_group.modifiers)[i]):
-                        o.append(Issue("Modifier", self.template_group.name, "Menu lists modifier as " + self.modifiers.sort()[i] + " instead of " + self.template_group.modifiers.sort()[i]))
+                        o.append(Issue("Modifier", self.template_group.name, "Menu lists modifier as " + sorted(self.modifiers)[i] + " instead of " + sorted(self.template_group.modifiers)[i]))
                 if(not o):
                     pass
                     #o.append(Issue("Modifier Group", self.template_group.name, "Modifiers scrambled within modifier group - adjust order of modifiers to match template"))
@@ -81,7 +81,7 @@ class Menu:
         elem.send_keys(Keys.ENTER)
         time.sleep(1)
         driver.get(deep_link)
-        time.sleep(1.5)
+        time.sleep(2.5)
 
         #Load categories
         category_list = driver.find_elements_by_css_selector("h2[data-category-scroll-selector]")
@@ -91,14 +91,17 @@ class Menu:
 
         #Load items
         #items are located by searching rectangular buttons
-        item_button_list = driver.find_elements_by_xpath("//h2[@data-category-scroll-selector='Popular%20Items']/parent::div/following-sibling::div/descendant::button")
+        item_button_list = driver.find_elements_by_xpath("//button[@shape='Rectangle']")
+        for button in item_button_list:
+            if(button.find_element_by_xpath("./../../preceding-sibling").find_elements_by_xpath("//h3")):
+                item_button_list.remove(button)
         actions = ActionChains(driver)
         actions2 = ActionChains(driver)
         for i in item_button_list:
             actions.move_to_element(i).perform()
             i.click()
             time.sleep(2)
-            header_description = driver.find_elements_by_css_selector("span[overflow='normal']")
+            header_description = driver.find_elements_by_css_selector("span[overflow='normal'][display='block']")
             item_title = header_description[0].find_element_by_css_selector("span").text
             item_description = header_description[1].text
             print("Item Title: " + item_title)

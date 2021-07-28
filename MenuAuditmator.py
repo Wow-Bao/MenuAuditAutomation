@@ -20,7 +20,7 @@ class Item:
         if(len(self.modifier_groups) > len(self.template_item.modifier_groups)):
             output.append(Issue("Item", self.template_item.name, "Too many modifier groups"))
         elif(len(self.modifier_groups) < len(self.template_item.modifier_groups)):
-            output.append(Issue("Item", self.template_item.name, "Too few modifier groups"))    
+            output.append(Issue("Item", self.template_item.name, "Too few modifier groups"))
         else:
             for i in range(0, len(self.modifier_groups)):
                 if(self.modifier_groups[i].getIssues(self.template_item.modifier_groups[i])):
@@ -31,6 +31,7 @@ class ModifierGroup:
     def __init__(self, name, modifiers):
         self.name = name
         self.modifiers = modifiers
+        self.parent = None
         self.template_group = None
     def addModifier(self, modifier):
         self.modifiers.append(modifier)
@@ -38,19 +39,19 @@ class ModifierGroup:
         self.template_group = template_group
         output = []
         if(self.name != self.template_group.name):
-            output.append(Issue("Modifier Group", self.template_group.name, "Name does not match template"))
+            output.append(Issue("Modifier Group", self.parent.name + "/" + self.template_group.name, "Name does not match template"))
             
         if(len(self.modifiers) != len(self.template_group.modifiers)):
-            output.append(Issue("Modifier Group", self.template_group.name, "Incorrect number of modifiers within modifier group - either missing or too many modifiers"))
+            output.append(Issue("Modifier Group", self.parent.name + "/" + self.template_group.name, "Incorrect number of modifiers within modifier group - either missing or too many modifiers"))
         else:
             o=[]
             if(self.modifiers != self.template_group.modifiers):
                 for i in range(0, len(self.modifiers)):
                     if(sorted(self.modifiers)[i] != sorted(self.template_group.modifiers)[i]):
-                        o.append(Issue("Modifier", self.template_group.name, "Menu lists modifier as " + sorted(self.modifiers)[i] + " instead of " + sorted(self.template_group.modifiers)[i]))
+                        o.append(Issue("Modifier", self.parent.name + "/" + self.template_group.name, "Menu lists modifier as " + sorted(self.modifiers)[i] + " instead of " + sorted(self.template_group.modifiers)[i]))
                 if(not o):
                     pass
-                    #o.append(Issue("Modifier Group", self.template_group.name, "Modifiers scrambled within modifier group - adjust order of modifiers to match template"))
+                    #o.append(Issue("Modifier Group", self.parent.name + "/" + self.template_group.name, "Modifiers scrambled within modifier group - adjust order of modifiers to match template"))
             output.extend(o)
         return output
 
@@ -92,9 +93,6 @@ class Menu:
         #Load items
         #items are located by searching rectangular buttons
         item_button_list = driver.find_elements_by_xpath("//button[@shape='Rectangle']")
-        for button in item_button_list:
-            if(button.find_element_by_xpath("./../../preceding-sibling").find_elements_by_xpath("//h3")):
-                item_button_list.remove(button)
         actions = ActionChains(driver)
         actions2 = ActionChains(driver)
         for i in item_button_list:
@@ -102,8 +100,12 @@ class Menu:
             i.click()
             time.sleep(2)
             header_description = driver.find_elements_by_css_selector("span[overflow='normal'][display='block']")
-            item_title = header_description[0].find_element_by_css_selector("span").text
+            item_title = header_description[0].text
             item_description = header_description[1].text
+            close = driver.find_element_by_css_selector("button[aria-label*='Close']")
+            if item_title in [i.name for i in self.items]:
+                close.click()
+                continue
             print("Item Title: " + item_title)
             print("Item Description: " + item_description)
             menu_modal_body = driver.find_element_by_css_selector("div[data-anchor-id='MenuItemModalBody']")
@@ -127,10 +129,14 @@ class Menu:
                     mgroups.append(ModifierGroup(group_title, modifiers))
             except NameError:
                 print("no modifiers for this item")
-            self.items.append(Item(item_title, item_description, mgroups))
+            item = Item(item_title, item_description, mgroups)
+            for mgroup in item.modifier_groups:
+                mgroup.parent = item
+            self.items.append(item)
             close = driver.find_element_by_css_selector("button[aria-label*='Close']")
             close.click()
             time.sleep(1)
+        driver.close()
     def compare(self):
         """Compares the loaded menu with a template (set by the template_menu property) and outputs a list of Issue objects"""
         real_items = self.items.copy()

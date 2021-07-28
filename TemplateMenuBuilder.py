@@ -2,10 +2,9 @@ from MenuAuditmator import ModifierGroup, Item, Menu
 import json
 import pandas as pd
 
-def BuildMenuTemplate(itemFile, mGroupFile, isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
+def BuildMenuTemplate(menuJSONFile, isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
     """This method returns a template Menu object based on SF parameters for the menu and a menu reference JSON file. Method output is the optimal menu for a location - what it should be."""
-    infile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/MenuReference.json"
-    with open(infile) as file:
+    with open(menuJSONFile) as file:
         data = json.load(file)
     
     template_menu = Menu(None, None)

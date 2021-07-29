@@ -34,10 +34,10 @@ for location in locations.iterrows():
         address = location[1]["Store Address"] + " " + location[1]["Store City"] + " " + location[1]["Store State"] + " " + str(location[1]["Store Zip"])
         menu_params = {
             "isCheeseburgerBao":("Yes" == location[1].get("Cheeseburger Bao", "No")),
-            "isCoconutBao":("Yes" == location[1].get("Cheeseburger Bao", "No")),
-            "isEggSausageBao":("Yes" == location[1].get("Cheeseburger Bao", "No")),
-            "isIMPOSSIBLEBao":("Yes" == location[1].get("Cheeseburger Bao", "No")),
-            "isBundles":("Yes" == location[1].get("Cheeseburger Bao", "No")),
+            "isCoconutBao":("Yes" == location[1].get("Coconut Bao", "No")),
+            "isEggSausageBao":("Yes" == location[1].get("Egg & Sausage Bao", "No")),
+            "isIMPOSSIBLEBao":("Yes" == location[1].get("IMPOSSIBLE Bao", "No")),
+            "isBundles":("Yes" == location[1].get("Bundles", "No")),
             ##TODO: figure out a better way to handle combined potsticker/dumpling category
             "isPotDumpCombined":False
         }

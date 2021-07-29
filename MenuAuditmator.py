@@ -2,6 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 
 class Item:
@@ -13,18 +16,24 @@ class Item:
     def addModifierGroup(self, group):
         self.modifier_groups.append(group)
     def getIssues(self):
+        real_groups = self.modifier_groups.copy()
+        template_groups = self.template_item.modifier_groups.copy()
+
         output = []
         if(self.description != self.template_item.description):
-            output.append(Issue("Item", self.template_item.name, "Incorrect description"))
-            
-        if(len(self.modifier_groups) > len(self.template_item.modifier_groups)):
-            output.append(Issue("Item", self.template_item.name, "Too many modifier groups"))
-        elif(len(self.modifier_groups) < len(self.template_item.modifier_groups)):
-            output.append(Issue("Item", self.template_item.name, "Too few modifier groups"))
-        else:
-            for i in range(0, len(self.modifier_groups)):
-                if(self.modifier_groups[i].getIssues(self.template_item.modifier_groups[i])):
-                    output.extend(self.modifier_groups[i].getIssues(self.template_item.modifier_groups[i]))
+            output.append(Issue("Item", self.template_item.name, "Incorrect description: menu lists '" + self.description + "' instead of '" + self.template_item.description))
+        groups_to_compare = []
+        for t_group in template_groups:
+            if(t_group.name in [i.name for i in real_groups]):
+                real_groups[[i.name for i in real_groups].index(t_group.name)].template_group = t_group
+                groups_to_compare.append(real_groups[[i.name for i in real_groups].index(t_group.name)])
+            else:
+                output.append(Issue("Modifier Group", self.name, t_group.name + " is missing!"))
+        for r_group in real_groups:
+            if(r_group.name not in [i.name for i in groups_to_compare]):
+                output.append(Issue("Item", self.name, "Extraneous item " + r_group.name + " found"))
+        for g in groups_to_compare:
+            output.extend(g.getIssues(g.template_group))
         return output
 
 class ModifierGroup:
@@ -40,9 +49,11 @@ class ModifierGroup:
         output = []
         if(self.name != self.template_group.name):
             output.append(Issue("Modifier Group", self.parent.name + "/" + self.template_group.name, "Name does not match template"))
-            
-        if(len(self.modifiers) != len(self.template_group.modifiers)):
-            output.append(Issue("Modifier Group", self.parent.name + "/" + self.template_group.name, "Incorrect number of modifiers within modifier group - either missing or too many modifiers"))
+        if(len(self.modifiers) < len(self.template_group.modifiers)):
+            missing = set(self.template_group.modifiers) - set(self.modifiers)
+            output.append(Issue("Modifier Group", self.parent.name + "/" + self.template_group.name, "Missing modifiers"))
+        elif(len(self.modifiers) > len(self.template_group.modifiers)):
+            output.append(Issue("Modifier Group", self.parent.name + "/" + self.template_group.name, "Too many modifiers"))
         else:
             o=[]
             if(self.modifiers != self.template_group.modifiers):
@@ -73,20 +84,25 @@ class Menu:
     def loadItems(self, deep_link):
         """Scrapes DoorDash menu page for all the necessary data and loads it into Item and ModifierGroup objects within the Menu object"""
         driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe")
-        driver.get("https://www.doordash.com/?newUser=false")
-        time.sleep(3)
-        elem = driver.find_element_by_css_selector("input")
-        elem.clear()
-        elem.send_keys(self.address)
-        time.sleep(0.5)
-        elem.send_keys(Keys.ENTER)
-        time.sleep(1)
         driver.get(deep_link)
-        time.sleep(2.5)
+        dummy = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='Address']")))
+        time.sleep(1)
+        address_field = driver.find_element_by_css_selector("input[placeholder='Address']")
+        address_field.send_keys(self.address)
+        time.sleep(0.5)
+        address_field.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        driver.find_element_by_css_selector("button[data-anchor-id='AddressEditSave']").click()
+        time.sleep(1)
 
         #Load categories
         category_list = driver.find_elements_by_css_selector("h2[data-category-scroll-selector]")
         category_texts = [e.text for e in category_list]
+        try:
+            category_texts.remove("Popular Items")
+        except:
+            pass
         self.categories = category_texts
         print(self.categories)
 
@@ -94,14 +110,21 @@ class Menu:
         #items are located by searching rectangular buttons
         item_button_list = driver.find_elements_by_xpath("//button[@shape='Rectangle']")
         actions = ActionChains(driver)
-        actions2 = ActionChains(driver)
         for i in item_button_list:
-            actions.move_to_element(i).perform()
+            driver.execute_script("var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);"
+                                            + "var elementTop = arguments[0].getBoundingClientRect().top;"
+                                            + "window.scrollBy(0, elementTop-(viewPortHeight/2));", i)
             i.click()
-            time.sleep(2)
-            header_description = driver.find_elements_by_css_selector("span[overflow='normal'][display='block']")
-            item_title = header_description[0].text
-            item_description = header_description[1].text
+            dummy = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "button[aria-label*='Close']")))
+            header_description = i.text.split("\n")
+            item_title = header_description[0]
+            try:
+                item_description = header_description[1]
+            except:
+                item_description = ""
+            # header_description = driver.find_elements_by_css_selector("span[overflow='normal'][display='block']")
+            # item_title = header_description[0].text
+            # item_description = header_description[1].text
             close = driver.find_element_by_css_selector("button[aria-label*='Close']")
             if item_title in [i.name for i in self.items]:
                 close.click()
@@ -122,10 +145,11 @@ class Menu:
                     for div in modifier_containers:
                         #print(div.get_attribute('innerHTML'))
                         modifiers.append(div.find_element_by_css_selector("div").find_element_by_css_selector("span").text)
-                    print("Modifier group: " + group_title)
-                    print("Number tag: " + group_number_tag)
+                    #print("Modifier group: " + group_title)
+                    #print("Number tag: " + group_number_tag)
                     for modifier in modifiers:
-                        print(modifier)
+                        #print(modifier)
+                        pass
                     mgroups.append(ModifierGroup(group_title, modifiers))
             except NameError:
                 print("no modifiers for this item")

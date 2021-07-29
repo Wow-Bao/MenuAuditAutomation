@@ -39,7 +39,7 @@ def BuildMenuTemplate(menuJSONFile, isCheeseburgerBao, isCoconutBao, isEggSausag
 
 
     for i in data['Items']:
-        if(category.get("bundleDependency", isBundles)==isBundles):
+        if(i.get("bundleDependency", isBundles)==isBundles):
             mgs = []
             for m in i.get("ModifierGroups", []):
                 mgs.append(ModifierGroup(m["Name"], modifier_sets[m["ModifierSet"]]))

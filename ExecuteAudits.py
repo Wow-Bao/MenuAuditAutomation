@@ -1,11 +1,10 @@
 from MenuAuditmator import Menu, Issue
 from TemplateMenuBuilder import BuildMenuTemplate
 import pandas as pd
+from datetime import datetime
 
-# input_deep_link = sys.argv[1]
-
-infile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/testAudits.csv"
-outfile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/AuditOutputTest.csv"
+infile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/report1628004957167.csv"
+outfile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/AuditOutputTest" + datetime.now().strftime('%Y-%m-%d-%h-%m') + ".csv"
 def audit(address, deep_link, isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
     menu = Menu(address, None)
     temp = BuildMenuTemplate('C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/MenuReference.json', isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, False)#isPotDumpCombined)
@@ -30,7 +29,7 @@ locations = pd.read_csv(infile)
 rows = []
 
 for location in locations.iterrows():
-    #try:
+    try:
         address = location[1]["Store Address"] + " " + location[1]["Store City"] + " " + location[1]["Store State"] + " " + str(location[1]["Store Zip"])
         menu_params = {
             "isCheeseburgerBao":("Yes" == location[1].get("Cheeseburger Bao", "No")),
@@ -52,9 +51,9 @@ for location in locations.iterrows():
         }
         rows.append(dict)
         print("successfully audited " + location[1]["Opportunity Name"] + ": found " + str(len(issues)) + " issues")
-    #except:
+    except:
         print("exception while auditing " + location[1]["Opportunity Name"])
 
 df_output = pd.DataFrame(rows)
 
-df_output.to_csv("auditOutput.csv")
+df_output.to_csv(outfile)

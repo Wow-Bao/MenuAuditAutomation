@@ -1,6 +1,5 @@
 from MenuAuditmator import ModifierGroup, Item, Menu
 import json
-import pandas as pd
 
 def BuildMenuTemplate(menuJSONFile, isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
     """This method returns a template Menu object based on SF parameters for the menu and a menu reference JSON file. Method output is the optimal menu for a location - what it should be."""
@@ -24,7 +23,7 @@ def BuildMenuTemplate(menuJSONFile, isCheeseburgerBao, isCoconutBao, isEggSausag
     pot_dump_modifiers = ["Ginger Chicken", "Green Vegetable"]
     bowl_modifiers = ["Teriyaki Chicken Bowl", "Spicy Kung Pao Chicken Bowl", "Orange Chicken Bowl"]
 
-    #continegent modifiers (atm only bao)
+    #contingent modifiers (atm only bao)
     if(isCheeseburgerBao):
         bao_modifiers.append("Cheeseburger")
     if(isCoconutBao):

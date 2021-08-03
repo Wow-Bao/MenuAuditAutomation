@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 
 class Item:
+    """Object representing one DoorDash item"""
     def __init__(self, name, description, modifier_groups):
         self.name = name
         self.description = description
@@ -16,6 +17,7 @@ class Item:
     def addModifierGroup(self, group):
         self.modifier_groups.append(group)
     def getIssues(self):
+        """Returns list of Issue objects corresponding to all of the issues with the Item and its child ModifierGroup objects"""
         real_groups = self.modifier_groups.copy()
         template_groups = self.template_item.modifier_groups.copy()
 
@@ -31,12 +33,13 @@ class Item:
                 output.append(Issue("Modifier Group", self.name, t_group.name + " is missing!"))
         for r_group in real_groups:
             if(r_group.name not in [i.name for i in groups_to_compare]):
-                output.append(Issue("Item", self.name, "Extraneous item " + r_group.name + " found"))
+                output.append(Issue("Modifier Group", self.name, "Extraneous modifier group " + r_group.name + " found"))
         for g in groups_to_compare:
             output.extend(g.getIssues(g.template_group))
         return output
 
 class ModifierGroup:
+    """Object representing a modifier group on DoorDash"""
     def __init__(self, name, modifiers):
         self.name = name
         self.modifiers = modifiers
@@ -45,6 +48,7 @@ class ModifierGroup:
     def addModifier(self, modifier):
         self.modifiers.append(modifier)
     def getIssues(self, template_group):
+        """Returns a list of Issue objects corresponding to the discrepancies between self and template_group"""
         self.template_group = template_group
         output = []
         if(self.name != self.template_group.name):
@@ -67,6 +71,7 @@ class ModifierGroup:
         return output
 
 class Issue:
+    """Object representing one issue with a menu"""
     def __init__(self, level, location, body):
         self.level = level
         self.location = location
@@ -75,6 +80,7 @@ class Issue:
         return self.level + " - " + self.location + " - " + self.body
 
 class Menu:
+    """Object representing a DoorDash Menu"""
     def __init__(self, address, template_menu):
         self.items = []
         self.categories = []
@@ -83,8 +89,11 @@ class Menu:
         self.issues = []
     def loadItems(self, deep_link):
         """Scrapes DoorDash menu page for all the necessary data and loads it into Item and ModifierGroup objects within the Menu object"""
+        #Load webpage
         driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe")
         driver.get(deep_link)
+
+        #Enter address
         dummy = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='Address']")))
         time.sleep(1)
         address_field = driver.find_element_by_css_selector("input[placeholder='Address']")
@@ -92,7 +101,6 @@ class Menu:
         time.sleep(0.5)
         address_field.send_keys(Keys.ENTER)
         time.sleep(1)
-
         driver.find_element_by_css_selector("button[data-anchor-id='AddressEditSave']").click()
         time.sleep(1)
 
@@ -131,6 +139,7 @@ class Menu:
                 continue
             print("Item Title: " + item_title)
             print("Item Description: " + item_description)
+            time.sleep(0.5)
             menu_modal_body = driver.find_element_by_css_selector("div[data-anchor-id='MenuItemModalBody']")
             mgroups = []
             try:
@@ -159,7 +168,7 @@ class Menu:
             self.items.append(item)
             close = driver.find_element_by_css_selector("button[aria-label*='Close']")
             close.click()
-            time.sleep(1)
+            time.sleep(0.5)
         driver.close()
     def compare(self):
         """Compares the loaded menu with a template (set by the template_menu property) and outputs a list of Issue objects"""
@@ -185,6 +194,9 @@ class Menu:
         for e_category in real_categories:
             if(e_category not in template_categories):
                 output.append(Issue("Category", e_category, "Category " + e_category + " not on template menu"))
+        
+        if(self.categories[0] != "Bao"):
+            output.append(Issue("Category", "Layout", "First category on menu not Bao"))
 
         #compare lists of items
         for t_item in template_items:

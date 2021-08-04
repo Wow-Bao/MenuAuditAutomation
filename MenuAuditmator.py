@@ -87,7 +87,7 @@ class Menu:
         self.address = address
         self.template_menu = template_menu
         self.issues = []
-    def loadItems(self, deep_link):
+    def loadItemsDD(self, deep_link):
         """Scrapes DoorDash menu page for all the necessary data and loads it into Item and ModifierGroup objects within the Menu object"""
         #Load webpage
         driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe")
@@ -159,6 +159,94 @@ class Menu:
                     for modifier in modifiers:
                         #print(modifier)
                         pass
+                    mgroups.append(ModifierGroup(group_title, modifiers))
+            except NameError:
+                print("no modifiers for this item")
+            item = Item(item_title, item_description, mgroups)
+            for mgroup in item.modifier_groups:
+                mgroup.parent = item
+            self.items.append(item)
+            close = driver.find_element_by_css_selector("button[aria-label*='Close']")
+            close.click()
+            time.sleep(0.5)
+        driver.close()
+    def loadItemsUE(self, deep_link):
+        """Scrapes Uber Eats menu page for all the necessary data and loads it into Item and ModifierGroup objects within the Menu object"""
+        #Load webpage
+        driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe")
+        driver.get(deep_link)
+
+        #Enter address
+        dummy = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "input#location-typeahead-location-manager-input")))
+        time.sleep(1)
+        address_field = driver.find_element_by_css_selector("input#location-typeahead-location-manager-input")
+        address_field.send_keys(self.address)
+        time.sleep(0.5)
+        address_field.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        #Load categories
+        category_list = driver.find_elements_by_css_selector("h2")
+        trimmed_category_list = []
+        category_texts = [e.text for e in category_list]
+        for e in category_list:
+                if(e.text != "Picked for you"):
+                    trimmed_category_list.append(e)
+        try:
+            category_texts.remove("Picked for you")
+        except:
+            pass
+        self.categories = category_texts
+        print(self.categories)
+
+        #Load items
+        #items are located by searching rectangular buttons
+
+        category_block_list = [e.find_element(By.XPATH, "./..") for e in category_list]
+        item_button_list = []
+        for category in category_block_list:
+            item_button_list.extend(category.find_elements_by_css_selector("li"))
+
+        for i in item_button_list:
+            driver.execute_script("var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);"
+                                            + "var elementTop = arguments[0].getBoundingClientRect().top;"
+                                            + "window.scrollBy(0, elementTop-(viewPortHeight/2));", i)
+            i.click()
+            dummy = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "button[aria-label*='Close']")))
+            whole = driver.find_element_by_css_selector("div[role='dialog']")
+
+            item_title_elem = whole.find_element_by_css_selector("h1")
+            item_title = item_title_elem.text
+            try:
+                item_description = item_title_elem.find_element(By.XPATH("./following-sibling::div"))
+            except:
+                item_description = ""
+
+
+            close = driver.find_element_by_css_selector("button[aria-label*='Close']")
+            print("Item Title: " + item_title)
+            print("Item Description: " + item_description)
+
+            time.sleep(0.5)
+            
+            mgroups = []
+            try:
+                modifier_groups = whole.find_element_by_css_selector("ul").find_elements_by_css_selector("li")
+                for group in modifier_groups:
+                    elems = group.find_elements(By.XPATH, "./descendant::div[contains(text(),'')]")
+                    texts = []
+
+                    for e in elems:
+                        if(('\n' not in e.text) and e.text):
+                            texts.append(e)
+
+                    try:
+                        texts.remove("Required")
+                    except:
+                        pass
+                    
+                    group_title = texts[0].text
+                    modifiers = [e for e in texts[1:]]
                     mgroups.append(ModifierGroup(group_title, modifiers))
             except NameError:
                 print("no modifiers for this item")

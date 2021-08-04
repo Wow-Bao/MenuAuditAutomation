@@ -5,10 +5,26 @@ from datetime import datetime
 
 infile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/report1628004957167.csv"
 outfile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/AuditOutputTest" + datetime.now().strftime('%Y-%m-%d-%h-%m') + ".csv"
-def audit(address, deep_link, isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
+def auditDD(address, deep_link, isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
     menu = Menu(address, None)
     temp = BuildMenuTemplate('C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/MenuReference.json', isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, False)#isPotDumpCombined)
-    menu.loadItems(deep_link)
+    
+    menu.loadItemsDD(deep_link)
+
+    if "Potstickers and Dumplings" in menu.categories:
+        temp.categories.remove("Pan-Seared Potstickers")
+        temp.categories.remove("Steamed Dumplings")
+        temp.categories.append("Potstickers and Dumplings")
+
+    menu.template_menu = temp
+
+    return menu.compare()
+
+def auditUE(address, deep_link, isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
+    menu = Menu(address, None)
+    temp = BuildMenuTemplate('C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/UEMenuReference.json', isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, False)#isPotDumpCombined)
+    
+    menu.loadItemsUE(deep_link)
 
     if "Potstickers and Dumplings" in menu.categories:
         temp.categories.remove("Pan-Seared Potstickers")
@@ -25,6 +41,7 @@ def writeIssues(issues):
         output = output + issue.output() + "\n"
     return output
 
+dum = auditUE("1900 E Higgins Rd Schaumburg IL 60173", "https://www.ubereats.com/en-US/chicago/food-delivery/wow-bao/MhoNwMbuS3u0Qr9NWNnyvA/", False, False, False, False, False, False)
 locations = pd.read_csv(infile)
 rows = []
 
@@ -40,14 +57,15 @@ for location in locations.iterrows():
             ##TODO: figure out a better way to handle combined potsticker/dumpling category
             "isPotDumpCombined":False
         }
-        issues = audit(address, location[1]["DD Deep Link"], menu_params["isCheeseburgerBao"], menu_params["isCoconutBao"], menu_params["isEggSausageBao"], menu_params["isIMPOSSIBLEBao"], menu_params["isBundles"], menu_params["isPotDumpCombined"])
+        issuesDD = auditDD(address, location[1]["DD Deep Link"], menu_params["isCheeseburgerBao"], menu_params["isCoconutBao"], menu_params["isEggSausageBao"], menu_params["isIMPOSSIBLEBao"], menu_params["isBundles"], menu_params["isPotDumpCombined"])
+        issuesUE = auditUE(address, location[1]["UE Deep Link"], menu_params["isCheeseburgerBao"], menu_params["isCoconutBao"], menu_params["isEggSausageBao"], menu_params["isIMPOSSIBLEBao"], menu_params["isBundles"], menu_params["isPotDumpCombined"])
         dict = {
             'Opportunity ID':location[1]["Opportunity ID"],
             'Opportunity Name':location[1]["Opportunity Name"],
-            'DD Category Issues':writeIssues([i for i in issues if i.level=="Category"]),
-            'DD Item Issues':writeIssues([i for i in issues if i.level=="Item"]),
-            'DD Modifier Group Issues':writeIssues([i for i in issues if i.level=="Modifier Group"]),
-            'DD Modifier Issues':writeIssues([i for i in issues if i.level=="Modifier"])
+            'DD Category Issues':writeIssues([i for i in issuesDD if i.level=="Category"]),
+            'DD Item Issues':writeIssues([i for i in issuesDD if i.level=="Item"]),
+            'DD Modifier Group Issues':writeIssues([i for i in issuesDD if i.level=="Modifier Group"]),
+            'DD Modifier Issues':writeIssues([i for i in issuesDD if i.level=="Modifier"])
         }
         rows.append(dict)
         print("successfully audited " + location[1]["Opportunity Name"] + ": found " + str(len(issues)) + " issues")

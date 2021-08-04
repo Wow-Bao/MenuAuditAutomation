@@ -3,11 +3,11 @@ from TemplateMenuBuilder import BuildMenuTemplate
 import pandas as pd
 from datetime import datetime
 
-infile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/report1628004957167.csv"
+infile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/testWithUE.csv"
 outfile = "C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/AuditOutputTest" + datetime.now().strftime('%Y-%m-%d-%h-%m') + ".csv"
 def auditDD(address, deep_link, isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
     menu = Menu(address, None)
-    temp = BuildMenuTemplate('C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/MenuReference.json', isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, False)#isPotDumpCombined)
+    temp = BuildMenuTemplate('C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/DDMenuReference.json', isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, False)#isPotDumpCombined)
     
     menu.loadItemsDD(deep_link)
 
@@ -41,7 +41,6 @@ def writeIssues(issues):
         output = output + issue.output() + "\n"
     return output
 
-dum = auditUE("1900 E Higgins Rd Schaumburg IL 60173", "https://www.ubereats.com/en-US/chicago/food-delivery/wow-bao/MhoNwMbuS3u0Qr9NWNnyvA/", False, False, False, False, False, False)
 locations = pd.read_csv(infile)
 rows = []
 
@@ -65,10 +64,14 @@ for location in locations.iterrows():
             'DD Category Issues':writeIssues([i for i in issuesDD if i.level=="Category"]),
             'DD Item Issues':writeIssues([i for i in issuesDD if i.level=="Item"]),
             'DD Modifier Group Issues':writeIssues([i for i in issuesDD if i.level=="Modifier Group"]),
-            'DD Modifier Issues':writeIssues([i for i in issuesDD if i.level=="Modifier"])
+            'DD Modifier Issues':writeIssues([i for i in issuesDD if i.level=="Modifier"]),
+            'UE Category Issues':writeIssues([i for i in issuesUE if i.level=="Category"]),
+            'UE Item Issues':writeIssues([i for i in issuesUE if i.level=="Item"]),
+            'UE Modifier Group Issues':writeIssues([i for i in issuesUE if i.level=="Modifier Group"]),
+            'UE Modifier Issues':writeIssues([i for i in issuesUE if i.level=="Modifier"])
         }
         rows.append(dict)
-        print("successfully audited " + location[1]["Opportunity Name"] + ": found " + str(len(issues)) + " issues")
+        print("successfully audited " + location[1]["Opportunity Name"] + ": found " + str(len(issuesDD) + len(issuesUE)) + " issues")
     except:
         print("exception while auditing " + location[1]["Opportunity Name"])
 

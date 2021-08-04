@@ -1,3 +1,4 @@
+from logging import error
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
@@ -183,6 +184,10 @@ class Menu:
         address_field.send_keys(self.address)
         time.sleep(0.5)
         address_field.send_keys(Keys.ENTER)
+        address_field.send_keys(Keys.ENTER)
+        address_field.send_keys(Keys.ENTER)
+        address_field.send_keys(Keys.ENTER)
+        address_field.send_keys(Keys.ENTER)
         time.sleep(1)
 
         #Load categories
@@ -206,49 +211,64 @@ class Menu:
         item_button_list = []
         for category in category_block_list:
             item_button_list.extend(category.find_elements_by_css_selector("li"))
-
+            
         for i in item_button_list:
             driver.execute_script("var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);"
                                             + "var elementTop = arguments[0].getBoundingClientRect().top;"
                                             + "window.scrollBy(0, elementTop-(viewPortHeight/2));", i)
             i.click()
+            time.sleep(0.5)
             dummy = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "button[aria-label*='Close']")))
             whole = driver.find_element_by_css_selector("div[role='dialog']")
 
+            dummy = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1")))
             item_title_elem = whole.find_element_by_css_selector("h1")
             item_title = item_title_elem.text
+            # try:
             try:
-                item_description = item_title_elem.find_element(By.XPATH("./following-sibling::div"))
+                try:
+                    item_description = item_title_elem.find_element(By.XPATH, "./../div").text
+                except:
+                    time.sleep(1)
+                    item_description = item_title_elem.find_element(By.XPATH, "./../div").text
             except:
-                item_description = ""
-
-
+                item_description=""
+            # except:
             close = driver.find_element_by_css_selector("button[aria-label*='Close']")
+            if item_title in [i.name for i in self.items]:
+                close.click()
+                continue
             print("Item Title: " + item_title)
             print("Item Description: " + item_description)
 
             time.sleep(0.5)
             
+            actions = ActionChains(driver)
             mgroups = []
             try:
+                dummy = WebDriverWait(whole, 10).until(EC.presence_of_element_located((By.XPATH, "//ul")))
                 modifier_groups = whole.find_element_by_css_selector("ul").find_elements_by_css_selector("li")
                 for group in modifier_groups:
                     elems = group.find_elements(By.XPATH, "./descendant::div[contains(text(),'')]")
                     texts = []
+                    actions.move_to_element(group)
 
-                    for e in elems:
-                        if(('\n' not in e.text) and e.text):
-                            texts.append(e)
+                    # for e in elems:
+                    #     if(('\n' not in e.text) and e.text):
+                    #         texts.append(e)
 
-                    try:
-                        texts.remove("Required")
-                    except:
-                        pass
+                    # try:
+                    #     texts[:] = [x for x in texts if x != "Required"]
+                    # except:
+                    #     pass
                     
-                    group_title = texts[0].text
-                    modifiers = [e for e in texts[1:]]
+                    group_title = group.find_element(By.XPATH, "./div[1]/div[1]/div[1]/div[1]").text
+                    modifier_elems = group.find_elements(By.XPATH, "./div[1]/div[2]/label/div/div/div/div[contains(text(),'')]")
+                    modifiers = [m.text for m in modifier_elems if m.text]
                     mgroups.append(ModifierGroup(group_title, modifiers))
-            except NameError:
+                    print("Group title: " + group_title)
+                    print(modifiers)
+            except (NameError, selenium.common.exceptions.NoSuchElementException):
                 print("no modifiers for this item")
             item = Item(item_title, item_description, mgroups)
             for mgroup in item.modifier_groups:

@@ -119,13 +119,22 @@ class Menu:
         item_button_list = driver.find_elements_by_xpath("//button[@shape='Rectangle']")
         actions = ActionChains(driver)
         for i in item_button_list:
+            #moves item listing to center of page
             driver.execute_script("var viewPortHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);"
                                             + "var elementTop = arguments[0].getBoundingClientRect().top;"
                                             + "window.scrollBy(0, elementTop-(viewPortHeight/2));", i)
+            
+            #click on item
             i.click()
+
+            #wait until close item listing button is on page to move on
             dummy = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "button[aria-label*='Close']")))
+            
+            #header_description holds the text for the title and description
             header_description = i.text.split("\n")
             item_title = header_description[0]
+
+            #if there is a description pull it, otherwise no description
             try:
                 item_description = header_description[1]
             except:
@@ -134,9 +143,12 @@ class Menu:
             # item_title = header_description[0].text
             # item_description = header_description[1].text
             close = driver.find_element_by_css_selector("button[aria-label*='Close']")
+
+            #if the item has already been loaded, don't load it again (Popular Items section)
             if item_title in [i.name for i in self.items]:
                 close.click()
                 continue
+
             print("Item Title: " + item_title)
             print("Item Description: " + item_description)
             time.sleep(0.5)
@@ -156,15 +168,18 @@ class Menu:
                         modifiers.append(div.find_element_by_css_selector("div").find_element_by_css_selector("span").text)
                     #print("Modifier group: " + group_title)
                     #print("Number tag: " + group_number_tag)
-                    for modifier in modifiers:
-                        #print(modifier)
-                        pass
+                    # for modifier in modifiers:
+                    #     #print(modifier)
+                    #     pass
                     mgroups.append(ModifierGroup(group_title, modifiers))
             except NameError:
                 print("no modifiers for this item")
             item = Item(item_title, item_description, mgroups)
+
+            #MG object needs to know its parent to generate correct location in getIssues()
             for mgroup in item.modifier_groups:
                 mgroup.parent = item
+            
             self.items.append(item)
             close = driver.find_element_by_css_selector("button[aria-label*='Close']")
             close.click()

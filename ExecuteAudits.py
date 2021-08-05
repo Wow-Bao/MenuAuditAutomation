@@ -31,6 +31,8 @@ rows = []
 for location in locations.iterrows():
     try:
         address = location[1]["Store Address"] + " " + location[1]["Store City"] + " " + location[1]["Store State"] + " " + str(location[1]["Store Zip"])
+        
+        #converting Yes/No from SF report to True/False in dict
         menu_params = {
             "isCheeseburgerBao":("Yes" == location[1].get("Cheeseburger Bao", "No")),
             "isCoconutBao":("Yes" == location[1].get("Coconut Bao", "No")),
@@ -40,6 +42,7 @@ for location in locations.iterrows():
             ##TODO: figure out a better way to handle combined potsticker/dumpling category
             "isPotDumpCombined":False
         }
+
         issues = audit(address, location[1]["DD Deep Link"], menu_params["isCheeseburgerBao"], menu_params["isCoconutBao"], menu_params["isEggSausageBao"], menu_params["isIMPOSSIBLEBao"], menu_params["isBundles"], menu_params["isPotDumpCombined"])
         dict = {
             'Opportunity ID':location[1]["Opportunity ID"],

@@ -35,11 +35,28 @@ def auditUE(address, deep_link, isCheeseburgerBao, isCoconutBao, isEggSausageBao
 
     return menu.compare()
 
+def auditGH(address, deep_link, isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, isPotDumpCombined):
+    menu = Menu(address, None)
+    temp = BuildMenuTemplate('C:/Users/creek/Desktop/WowBaoScripts/MenuAuditAutomation/UEMenuReference.json', isCheeseburgerBao, isCoconutBao, isEggSausageBao, isIMPOSSIBLEBao, isBundles, False)#isPotDumpCombined)
+    
+    menu.loadItemsGH(deep_link)
+
+    if "Potstickers and Dumplings" in menu.categories:
+        temp.categories.remove("Pan-Seared Potstickers")
+        temp.categories.remove("Steamed Dumplings")
+        temp.categories.append("Potstickers and Dumplings")
+
+    menu.template_menu = temp
+
+    return menu.compare()
+
 def writeIssues(issues):
     output = ""
     for issue in issues:
         output = output + issue.output() + "\n"
     return output
+
+g = auditGH("5202 W Washington St", "https://grubhub.com/restaurant/wow-bao-5202-w-washington-st-indianapolis/2561698?classicAffiliateId=%2Fr%2Fw%2F2561698%2F&utm_source=kitchen.grubhub.com&utm_medium=OOL&utm_campaign=order%20online&utm_content=2561698", False, False, False, False, False, False)
 
 locations = pd.read_csv(infile)
 rows = []

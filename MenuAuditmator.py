@@ -89,10 +89,11 @@ class Menu:
         self.address = address
         self.template_menu = template_menu
         self.issues = []
+        self.chromedriver_path = "C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe"
     def loadItemsDD(self, deep_link):
         """Scrapes DoorDash menu page for all the necessary data and loads it into Item and ModifierGroup objects within the Menu object"""
         #Load webpage
-        driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe")
+        driver = webdriver.Chrome(executable_path=self.chromedriver_path)
         driver.get(deep_link)
 
         #Enter address
@@ -150,7 +151,10 @@ class Menu:
                     modifier_containers = group.find_elements_by_xpath("*")
                     #print([mod.get_attribute("innerHTML") for mod in modifier_containers])
                     group_title_container = modifier_containers.pop(0).find_element_by_css_selector("div").find_elements_by_css_selector("span")
-                    group_title = group_title_container[0].text
+                    try:
+                        group_title = group_title_container[0].text
+                    except AttributeError:
+                        group_title = ""
                     group_number_tag = group_title_container[1].text
                     modifiers = []
                     for div in modifier_containers:
@@ -175,7 +179,7 @@ class Menu:
     def loadItemsUE(self, deep_link):
         """Scrapes Uber Eats menu page for all the necessary data and loads it into Item and ModifierGroup objects within the Menu object"""
         #Load webpage
-        driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe")
+        driver = webdriver.Chrome(executable_path=self.chromedriver_path)
         driver.get(deep_link)
 
         #Enter address
@@ -285,7 +289,7 @@ class Menu:
         options = webdriver.ChromeOptions()
         prefs = {"profile.default_content_setting_values.geolocation" :2}
         options.add_experimental_option("prefs",prefs)
-        driver = webdriver.Chrome(executable_path="C:/Users/creek/Desktop/ChromeDriver/chromedriver.exe", chrome_options=options)
+        driver = webdriver.Chrome(executable_path=self.chromedriver_path, chrome_options=options)
         driver.delete_all_cookies()
         time.sleep(2)
         driver.get(deep_link)
